@@ -15,63 +15,68 @@ class UserController {
 
             event.preventDefault();
 
+            let btn = this.formEl.querySelector("[type=submit]");
+
+            btn.disabled = true;
+
             let values = this.getValues();
 
             this.getPhoto().then(
-                
-                (content)=>{
-                    
-                values.photo = content;
+                (content) => {
 
-                this.addLine(values);
+                    values.photo = content;
 
+                    this.addLine(values);
 
-            },
-                (e)=>{
+                    this.formEl.reset();
 
+                    btn.disabled = false;
+
+                }, 
+                (e) => {
                     console.error(e)
+                }
+            );
+        
+        });
 
-            }
-            )
-
-            });
-
-        }
+    }
 
     getPhoto(){
 
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject) => {
 
             let fileReader = new FileReader();
 
             let elements = [...this.formEl.elements].filter(item => {
-    
+
                 if (item.name === 'photo') {
                     return item;
                 }
-    
+
             });
-    
+
             let file = elements[0].files[0];
-    
+
             fileReader.onload = () => {
-    
+
                 resolve(fileReader.result);
-    
+
             };
 
-            fileReader.onerror = (e)=>{
+            fileReader.onerror = (e) => {
 
                 reject(e);
 
-            }
-    
-            if (file){
+            };
+
+            if(file) {
                 fileReader.readAsDataURL(file);
-            }else{
+            } else {
                 resolve('dist/img/boxed-bg.jpg');
             }
-        })
+
+        });
 
     }
 
@@ -87,13 +92,13 @@ class UserController {
                     user[field.name] = field.value
                 }
     
-            } else if(field.name == "admin"){
+            } else if(field.name == "admin") {
 
                 user[field.name] = field.checked;
 
-            }else{
+            } else {
     
-                user[field.name] = field.value;
+                user[field.name] = field.value
     
             }
     
@@ -117,24 +122,21 @@ class UserController {
 
         let tr = document.createElement('tr');
 
-        tr.innerHTML = 
-        ` <tr>
-        <td><img src=${dataUser.photo} class="img-circle img-sm"></td>
-        <td>${dataUser.name}</td>
-        <td>${dataUser.email}</td>
-        <td>${(dataUser.admin ? 'Sim' : 'Não')}</td>
-        <td>${dataUser.birth}</td>
-        <td>
-            <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
-            <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-        </td>
-    </tr>
-`;
+        tr.innerHTML = `
+            <tr>
+                <td><img src=${dataUser.photo} class="img-circle img-sm"></td>
+                <td>${dataUser.name}</td>
+                <td>${dataUser.email}</td>
+                <td>${(dataUser.admin) ? 'Sim' : 'Não'}</td>
+                <td>${Utils.dateFormat(dataUser.register)}</td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+                    <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                </td>
+            </tr>
+        `;
 
         this.tableEl.appendChild(tr);
-           
-
-    
-        }
 
     }
+}
